@@ -1,0 +1,138 @@
+#Kaggle competition
+library(data.table)
+library(magrittr)
+dtrain <- read.csv("train_data.csv")
+
+dtrain$hmin[which(is.na(dtrain$hmin)) ] <- mean(dtrain$hmin, na.rm=TRUE) #removing NA from the Data and replacing it with the mean
+dtrain$dmin[which(is.na(dtrain$dmin)) ] <- mean(dtrain$dmin, na.rm=TRUE)
+dtrain$dmax[which(is.na(dtrain$dmax)) ] <- mean(dtrain$dmax, na.rm=TRUE)
+dtrain$dewp[which(is.na(dtrain$dewp)) ] <- mean(dtrain$dewp, na.rm=TRUE)
+dtrain$gbrd[which(is.na(dtrain$gbrd))] <- mean(dtrain$gbrd, na.rm=TRUE)
+dtrain$prcp[which(is.na(dtrain$prcp))] <- mean(dtrain$prcp, na.rm=TRUE)
+dtrain$gust[which(is.na(dtrain$gust))] <- mean(dtrain$gust, na.rm=TRUE)
+dtrain$wdsp[which(is.na(dtrain$wdsp))] <- mean(dtrain$wdsp, na.rm=TRUE)
+dtrain$elvt[which(is.na(dtrain$elvt))] <- mean(dtrain$elvt, na.rm=TRUE)
+dtrain$stp[which(is.na(dtrain$stp))] <-   mean(dtrain$stp, na.rm=TRUE)
+dtrain$smin[which(is.na(dtrain$smin))] <- mean(dtrain$smin, na.rm=TRUE)
+dtrain$smax[which(is.na(dtrain$smax))] <- mean(dtrain$smax, na.rm=TRUE)
+summary(dtrain)
+dtest$hmin[which(is.na(dtest$hmin)) ] <- mean(dtest$hmin, na.rm=TRUE)
+dtest$dmin[which(is.na(dtest$dmin)) ] <- mean(dtest$dmin, na.rm=TRUE)
+dtest$dmax[which(is.na(dtest$dmax)) ] <- mean(dtest$dmax, na.rm=TRUE)
+dtest$dewp[which(is.na(dtest$dewp)) ] <- mean(dtest$dewp, na.rm=TRUE)
+dtest$gbrd[which(is.na(dtest$gbrd))] <- mean(dtest$gbrd, na.rm=TRUE)
+dtest$prcp[which(is.na(dtest$prcp))] <- mean(dtest$prcp, na.rm=TRUE)
+dtest$gust[which(is.na(dtest$gust))] <- mean(dtest$gust, na.rm=TRUE)
+dtest$wdsp[which(is.na(dtest$wdsp))] <- mean(dtest$wdsp, na.rm=TRUE)
+dtest$smin[which(is.na(dtest$smin)) ] <- mean(dtest$smin, na.rm=TRUE)
+dtest$smax[which(is.na(dtest$smax)) ] <- mean(dtest$smax, na.rm=TRUE)
+dtest$stp[which(is.na(dtest$stp)) ] <- mean(dtest$stp, na.rm=TRUE)
+dtest$elvt[which(is.na(dtest$elvt)) ] <- mean(dtest$elvt, na.rm=TRUE)
+
+
+dtrain<-dtrain[ , !(names(dtrain) %in% c('yr','da','mdct','city','inme','wsnm','gbrd'))] #removing the var in the c()
+
+dtest<-dtest[ , !(names(dtest) %in% c('id','yr','da','mdct','city','inme','wsnm','gbrd'))]
+
+
+
+#install.packages('imputeTS')
+library(imputeTS)
+names<-unique(dtrain$wsid) #gives the numbers without repetition
+
+
+for(i in names) {
+  dtrain$stp[dtrain$wsid==i]<-na.interpolation( dtrain$stp[dtrain$wsid==i],option = 'spline') #uses either linear, spline or stineman interpolation to replace missing values
+  dtrain$smax[dtrain$wsid==i]<-na.interpolation( dtrain$smax[dtrain$wsid==i],option = 'spline')
+  dtrain$smin[dtrain$wsid==i]<-na.interpolation( dtrain$smin[dtrain$wsid==i],option = 'spline')
+  dtrain$temp[dtrain$wsid==i]<-na.interpolation( dtrain$temp[dtrain$wsid==i],option = 'spline')
+  dtrain$dewp[dtrain$wsid==i]<-na.interpolation( dtrain$dewp[dtrain$wsid==i],option = 'spline')
+  dtrain$dmax[dtrain$wsid==i]<-na.interpolation( dtrain$dmax[dtrain$wsid==i],option = 'spline')
+  dtrain$dmin[dtrain$wsid==i]<-na.interpolation( dtrain$dmin[dtrain$wsid==i],option = 'spline')
+  dtrain$hmax[dtrain$wsid==i]<-na.interpolation( dtrain$hmax[dtrain$wsid==i],option = 'spline')
+  dtrain$hmin[dtrain$wsid==i]<-na.interpolation( dtrain$hmin[dtrain$wsid==i],option = 'spline')
+  dtrain$gust[dtrain$wsid==i]<-na.interpolation( dtrain$gust[dtrain$wsid==i],option = 'spline')
+  dtrain$wdsp[dtrain$wsid==i]<-na.interpolation( dtrain$wdsp[dtrain$wsid==i],option = 'spline')
+}
+
+names<-unique(dtest$wsid)
+
+
+for(i in names) {
+  dtest$stp[dtest$wsid==i]<-na.interpolation( dtest$stp[dtest$wsid==i],option = 'spline')
+  dtest$smax[dtest$wsid==i]<-na.interpolation( dtest$smax[dtest$wsid==i],option = 'spline')
+  dtest$smin[dtest$wsid==i]<-na.interpolation( dtest$smin[dtest$wsid==i],option = 'spline')
+  dtest$dewp[dtest$wsid==i]<-na.interpolation( dtest$dewp[dtest$wsid==i],option = 'spline')
+  dtest$dmax[dtest$wsid==i]<-na.interpolation( dtest$dmax[dtest$wsid==i],option = 'spline')
+  dtest$dmin[dtest$wsid==i]<-na.interpolation( dtest$dmin[dtest$wsid==i],option = 'spline')
+  dtest$hmax[dtest$wsid==i]<-na.interpolation( dtest$hmax[dtest$wsid==i],option = 'spline')
+  dtest$hmin[dtest$wsid==i]<-na.interpolation( dtest$hmin[dtest$wsid==i],option = 'spline')
+  dtest$gust[dtest$wsid==i]<-na.interpolation( dtest$gust[dtest$wsid==i],option = 'spline')
+  dtest$wdsp[dtest$wsid==i]<-na.interpolation( dtest$wdsp[dtest$wsid==i],option = 'spline')
+}
+
+
+
+
+library(dplyr)
+library(tidyr)
+
+dtrain<-dtrain[ , !(names(dtrain) %in% c('date','mdct','city','inme','wsnm'))]
+dtest<-dtest[ , !(names(dtest) %in% c('id','date','mdct','city','inme','wsnm'))]
+
+
+#catagorial variables to Dummy variables
+dtrain$prov_RJ<-ifelse (dtrain$prov=='RJ', 1,-1)
+dtrain$prov_ES<-ifelse (dtrain$prov=='ES', 1,-1)
+dtrain$prov_MG<-ifelse (dtrain$prov=='MG', 1,-1)
+dtrain$prov_SP<-ifelse (dtrain$prov=='SP', 1,-1)
+
+dtrain<- dtrain[ , !(names(dtrain) %in% 'prov')]
+
+#catagorial variables to Dummy variables
+dtest$prov_RJ<-ifelse (dtest$prov=='RJ', 1,-1)
+dtest$prov_ES<-ifelse (dtest$prov=='ES', 1,-1)
+dtest$prov_MG<-ifelse (dtest$prov=='MG', 1,-1)
+dtest$prov_SP<-ifelse (dtest$prov=='SP', 1,-1)
+
+dtest<- dtest[ , !(names(dtest) %in% 'prov')]
+
+
+
+set.seed(1992)
+test_len<-nrow(dtrain)*0.2
+as.integer(test_len)
+test_set<- sample (1:nrow(dtrain),test_len) #sample 20% of the train data #false or true after the tese_lean
+valid_set <- dtrain[test_set,]
+train_set <- dtrain[-test_set,] # 80% of the train data
+
+#install.packages("xgboost")
+library(xgboost)
+sapply(dtrain, class)
+
+
+
+# fit model
+bst <- xgboost(data = as.matrix(train_set[ ,!(names(train_set) %in% 'temp')]), label = train_set$temp, max.depth = 1000, eta = 1, nrounds = 100,
+               nthread = 7, objective = "reg:squarederror")
+
+preds.rf <- predict(bst, newdata = as.matrix(valid_set[ ,!(names(valid_set) %in% 'temp')])) #takes the model bst and apply it on the "test" data
+
+
+#Confusion Matrix
+cor(valid_set$temp,preds.rf) #chaking the corralation between the predicter temp and the origanal one
+
+
+final_preds <- predict(bst , newdata=as.matrix(dtest))
+#print plot
+#plot(final_preds)
+temp<-data.frame(final_preds)
+temp$id<-c(1:2351371)
+temp<-temp[,c(2,1)]
+names(temp)[names(temp) == "final_preds"] <- "temp"
+
+
+# Exporting Y
+write.csv(temp, file = "D:/PredXG.csv",row.names = FALSE)
+
+
